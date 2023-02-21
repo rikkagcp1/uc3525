@@ -69,6 +69,7 @@ tls：开启
 如当前 PaaS 容器支持 shell 方式连接，可使用 cat arg.log 重新查看节点链接
 更多项目，请关注：小御坂的破站
 EOF
+cat arg.log
 
 nginx
 base64 -d config > config.json
