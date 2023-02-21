@@ -29,7 +29,7 @@ rm -f config.json
 
 # 启用 Argo，并输出节点日志
 cloudflared tunnel --url http://localhost:80 --no-autoupdate > argo.log 2>&1 &
-argo_url=$(cat argo.log | grep -oE "https://.*[a-z]+cloudflare.com" | sed "s#https://##")
+sleep 5 && argo_url=$(cat argo.log | grep -oE "https://.*[a-z]+cloudflare.com" | sed "s#https://##")
 argo_xray_vmess="vmess://$(echo -n "\
 {\
 \"v\": \"2\",\
