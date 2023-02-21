@@ -36,7 +36,7 @@ argo_xray_vmess="vmess://$(echo -n "\
 \"ps\": \"Argo_xray_vmess\",\
 \"add\": \"${argo_url}\",\
 \"port\": \"443\",\
-\"id\": \"$uuid\",\
+\"id\": \"${UUID}\",\
 \"aid\": \"0\",\
 \"net\": \"ws\",\
 \"type\": \"none\",\
