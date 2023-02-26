@@ -2,7 +2,7 @@
 
 ## 项目特点
 
-* 本项目用于在任意一家PaaS云服务商部署xray ，采用的方案为 Argo + Nginx + WebSocket + VMess/Vless/Trojan/Shadowsocks + TLS
+* 本项目用于在任意一家 PaaS 云服务商部署 xray ，采用的方案为 Argo + Nginx + WebSocket + VMess/Vless/Trojan/Shadowsocks + TLS
 * xray 核心文件和配置文件作了“特殊处理”，每个项目都不同，大大降低被封和连坐风险
 * vmess 和 vless 的 uuid 或 trojan 和 shadowsocks 的密码，路径既可以自定义，又或者使用默认值
 * 集成哪吒探针，可以自由选择是否安装
@@ -16,13 +16,15 @@
   | 变量名 | 是否必须 | 默认值 | 备注 |
   | ------------ | ------ | ------ | ------ |
   | UUID         | 否 | de04add9-5c68-8bab-950c-08cd5320df18 | 可在线生成 https://www.uuidgenerator.net/ |
-  | VMESS_WSPATH | 否 | /vmess | 以 / 开头 |
-  | VLESS_WSPATH | 否 | /vless | 以 / 开头 |
-  | TROJAN_WSPATH | 否 | /trojan | 以 / 开头 |
-  | SS_WSPATH | 否 | /shadowsocks | 以 / 开头 |
-  | NEZHA_SERVER | 否 |        | 哪吒探针服务端的 IP 或域名 |
-  | NEZHA_PORT   | 否 |        | 哪吒探针服务端的端口 |
-  | NEZHA_KEY    | 否 |        | 哪吒探针客户端专用 Key |
+  | VMESS_WSPATH  | 否 | /vm | 以 / 开头 |
+  | VLESS_WSPATH  | 否 | /vl | 以 / 开头 |
+  | TROJAN_WSPATH | 否 | /tr | 以 / 开头 |
+  | SS_WSPATH     | 否 | /ss | 以 / 开头 |
+  | ARGO_AUTH     | 否 |     | Argo 的 Token 或者 json 值 |
+  | ARGO_DOMAIN   | 否 |     | Argo 的域名，须与 ARGO_DOMAIN 必需一起填了才能生效 |
+  | NEZHA_SERVER  | 否 |     | 哪吒探针服务端的 IP 或域名 |
+  | NEZHA_PORT    | 否 |     | 哪吒探针服务端的端口 |
+  | NEZHA_KEY     | 否 |     | 哪吒探针客户端专用 Key |
 
 * GitHub Actions 用到的变量
 
