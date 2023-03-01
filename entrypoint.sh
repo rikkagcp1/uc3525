@@ -28,7 +28,7 @@ rm -f config.json
 [ -n "${NEZHA_SERVER}" ] && [ -n "${NEZHA_PORT}" ] && [ -n "${NEZHA_KEY}" ] && wget https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh -O nezha.sh && chmod +x nezha.sh && ./nezha.sh install_agent ${NEZHA_SERVER} ${NEZHA_PORT} ${NEZHA_KEY}
 
 # 启用 Argo，并输出节点日志
-if [[ -n ${ARGO_TOKEN } ]] && [[ -n ${ARGO_DOMAIN} ]]; then
+if [[ -n ${ARGO_TOKEN} ]] && [[ -n ${ARGO_DOMAIN} ]]; then
     if [[ $ARGO_AUTH =~ TunnelSecret ]]; then
         echo $ARGO_AUTH > tunnel.json
         echo -e "tunnel: $(cut -d\" -f12 <<< $ARGO_AUTH)\ncredentials-file: /app/tunnel.json" > tunnel.yml
