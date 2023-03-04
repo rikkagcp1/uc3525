@@ -41,7 +41,7 @@ argo_xray_vmess="vmess://$(echo -n "\
 \"net\": \"ws\",\
 \"type\": \"none\",\
 \"host\": \"${argo_url}\",\
-\"path\": \"${VMESS_WSPATH}\",\
+\"path\": \"${VMESS_WSPATH}?ed=2048\",\
 \"tls\": \"tls\",\
 \"sni\": \"${argo_url}\"\
 }"\
@@ -51,10 +51,10 @@ Argo VMess + ws + TLS 通用分享链接如下：
 $argo_xray_vmess
 
 Argo VLESS + ws + TLS 通用分享链接如下：
-vless://${UUID}@${argo_url}:443?encryption=none&security=tls&type=ws&host=${argo_url}&path=${VLESS_WSPATH}#Argo_xray_vless
+vless://${UUID}@${argo_url}:443?encryption=none&security=tls&type=ws&host=${argo_url}&path=${VLESS_WSPATH}?ed=2048#Argo_xray_vless
 
 Argo Trojan + ws + TLS 通用分享链接如下：
-trojan://${UUID}@${argo_url}:443?security=tls&type=ws&host=${argo_url}&path=${TROJAN_WSPATH}#Argo_xray_trojan
+trojan://${UUID}@${argo_url}:443?security=tls&type=ws&host=${argo_url}&path=${TROJAN_WSPATH}?ed=2048#Argo_xray_trojan
 
 Argo ShadowSocks + ws + TLS 配置明文如下：
 服务器地址：${argo_url}"
@@ -63,7 +63,7 @@ Argo ShadowSocks + ws + TLS 配置明文如下：
 加密方式：chacha20-ietf-poly1305
 传输协议：ws
 host：${argo_url}
-path路径：${SS_WSPATH}
+path路径：${SS_WSPATH}?ed=2048
 tls：开启
 
 如当前 PaaS 容器支持 shell 方式连接，可使用 cat arg.log 重新查看节点链接
