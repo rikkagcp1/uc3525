@@ -7,7 +7,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY config.json ./
 COPY entrypoint.sh ./
 
-RUN apt-get update && apt-get install -y wget unzip iproute2 systemctl && \
+RUN apt-get update && apt-get install -y wget unzip qrencode iproute2 systemctl && \
     wget -O cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \
     dpkg -i cloudflared.deb && \
     rm -f cloudflared.deb && \
