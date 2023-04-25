@@ -41,6 +41,54 @@ qrencode -o /usr/share/nginx/html/T$UUID.png $trlink
 # 方便查找CF地址
 echo $argo_url > /usr/share/nginx/html/cf.txt
 
+cat > /usr/share/nginx/html/$UUID.json<<-EOF
+{
+  "log": {
+    "loglevel": "debug"
+  },
+  "inbounds": [
+    {
+      "port": 1080,
+      "protocol": "socks",
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [ "http", "tls" ]
+      },
+      "settings": {
+        "auth": "noauth",
+        "udp": true
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "vmess",
+      "settings": {
+        "vnext": [
+          {
+            "address": "$argo_url",
+            "port": 443,
+            "users": [
+              {
+                "id": "$UUID",
+                "alterId": 0
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "wsSettings": {
+          "path": "/vmess"
+        }
+      }
+    }
+  ]
+}
+EOF
+
 cat > /usr/share/nginx/html/$UUID.html<<-EOF
 <!DOCTYPE html>
 <html>
