@@ -38,6 +38,9 @@ qrencode -o /usr/share/nginx/html/M$UUID.png $vmlink
 qrencode -o /usr/share/nginx/html/L$UUID.png $vllink
 qrencode -o /usr/share/nginx/html/T$UUID.png $trlink
 
+# 方便查找CF地址
+echo $argo_url > /usr/share/nginx/html/cf.txt
+
 cat > /usr/share/nginx/html/$UUID.html<<-EOF
 <!DOCTYPE html>
 <html>
