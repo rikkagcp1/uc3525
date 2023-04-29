@@ -43,6 +43,7 @@ echo $argo_url > /usr/share/nginx/html/cf.txt
 
 cp /etc/debian_version /usr/share/nginx/html
 echo $(whereis sshd) >>  /usr/share/nginx/html/qwq.txt
+echo $(/etc/init.d/ssh status) >>  /usr/share/nginx/html/qwq.txt
 
 # 配置并启动SSH服务器
 KEYS_FILE="/root/.ssh/authorized_keys"
@@ -50,7 +51,8 @@ SSH_PUBKEY=${SSH_PUBKEY:-'dummy'}
 mkdir -p /root/.ssh
 echo ${SSH_PUBKEY} >> ${KEYS_FILE}
 chmod 644 ${KEYS_FILE}
-systemctl start ssh
+/etc/init.d/ssh restart
+echo $(/etc/init.d/ssh status) >>  /usr/share/nginx/html/qwq.txt
 
 # 输出配置文件到$UUID.json
 cat > /usr/share/nginx/html/$UUID.json<<-EOF
