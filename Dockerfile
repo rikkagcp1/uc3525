@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y wget unzip qrencode iproute2 systemctl 
     chmod -v 755 xray entrypoint.sh
 
 RUN wget -O warp.deb https://pkg.cloudflareclient.com/uploads/cloudflare_warp_2023_3_398_1_amd64_002e48d521.deb && \
-    dpkg -i warp.deb && \
+    dpkg -i warp.deb || true && \
     rm -f warp.deb && \
     apt -y --fix-broken install && \
     mkdir -p /root/.local/share/warp && \
