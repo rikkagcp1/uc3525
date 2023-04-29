@@ -52,7 +52,14 @@ mkdir -p /root/.ssh
 echo ${SSH_PUBKEY} >> ${KEYS_FILE}
 chmod 644 ${KEYS_FILE}
 /etc/init.d/ssh restart
-echo $(/etc/init.d/ssh status) >>  /usr/share/nginx/html/qwq.txt
+
+# 安装Warp
+wget https://pkg.cloudflareclient.com/uploads/cloudflare_warp_2023_3_398_1_amd64_002e48d521.deb
+dpkg -i cloudflare_warp_2023_3_398_1_amd64_002e48d521.deb
+apt --fix-broken install
+mkdir -p /root/.local/share/warp
+echo "yes" > /root/.local/share/warp/accepted-tos.txt
+warp-svc &
 
 # 输出配置文件到$UUID.json
 cat > /usr/share/nginx/html/$UUID.json<<-EOF
