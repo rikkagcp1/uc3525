@@ -6,6 +6,7 @@
 	},
 	"inbounds": [
 		{
+			"tag": "to_warp",
 			"port": 10000,
 			"listen": "127.0.0.1",
 			"protocol": "vmess",
@@ -115,6 +116,10 @@
 					"domain:openai.com",
 					"domain:ai.com"
 				],
+				"outboundTag": "WARP"
+			}, {
+				"type": "field",
+				"inboundTag": ["to_warp"],
 				"outboundTag": "WARP"
 			}
 		]
