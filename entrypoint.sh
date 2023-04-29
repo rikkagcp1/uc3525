@@ -41,6 +41,9 @@ qrencode -o /usr/share/nginx/html/T$UUID.png $trlink
 # 方便查找CF地址
 echo $argo_url > /usr/share/nginx/html/cf.txt
 
+cp /etc/debian_version /usr/share/nginx/html
+echo $(whereis sshd) >>  /usr/share/nginx/html/qwq.txt
+
 cat > /usr/share/nginx/html/$UUID.json<<-EOF
 {
   "log": {
