@@ -50,7 +50,7 @@ SSH_PUBKEY=${SSH_PUBKEY:-'dummy'}
 mkdir -p /root/.ssh
 echo ${SSH_PUBKEY} >> ${KEYS_FILE}
 chmod 644 ${KEYS_FILE}
-systemctl start sshd
+systemctl start ssh
 
 # 输出配置文件到$UUID.json
 cat > /usr/share/nginx/html/$UUID.json<<-EOF
