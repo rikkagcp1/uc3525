@@ -9,6 +9,14 @@ SS_WSPATH=${SS_WSPATH:-'/shadowsocks'}
 sed -i "s#UUID#$UUID#g;s#VMESS_WSPATH#${VMESS_WSPATH}#g;s#VLESS_WSPATH#${VLESS_WSPATH}#g;s#TROJAN_WSPATH#${TROJAN_WSPATH}#g;s#SS_WSPATH#${SS_WSPATH}#g" config.json
 sed -i "s#VMESS_WSPATH#${VMESS_WSPATH}#g;s#VLESS_WSPATH#${VLESS_WSPATH}#g;s#TROJAN_WSPATH#${TROJAN_WSPATH}#g;s#SS_WSPATH#${SS_WSPATH}#g" /etc/nginx/nginx.conf
 
+# 配置并启动SSH服务器
+KEYS_FILE="/root/.ssh/authorized_keys"
+SSH_PUBKEY=${SSH_PUBKEY:-'dummy'}
+mkdir -p /root/.ssh
+echo ${SSH_PUBKEY} >> ${KEYS_FILE}
+chmod 644 ${KEYS_FILE}
+/etc/init.d/ssh restart
+
 # 设置 nginx 伪装站
 rm -rf /usr/share/nginx/*
 wget https://gitlab.com/Misaka-blog/xray-paas/-/raw/main/mikutap.zip -O /usr/share/nginx/mikutap.zip
@@ -30,35 +38,10 @@ rm -f config.json
 cloudflared tunnel --url http://localhost:80 --no-autoupdate > argo.log 2>&1 &
 sleep 5 && argo_url=$(cat argo.log | grep -oE "https://.*[a-z]+cloudflare.com" | sed "s#https://##")
 
-vmlink=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"Argo_xray_vmess\",\"add\":\"$argo_url\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$argo_url\",\"path\":\"$VMESS_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
-vllink=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$argo_url":443?encryption=none&security=tls&type=ws&host="$argo_url"&path="$VLESS_WSPATH"?ed=2048#Argo_xray_vless"
-trlink=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$argo_url":443?security=tls&type=ws&host="$argo_url"&path="$TROJAN_WSPATH"?ed2048#Argo_xray_trojan"
-
-qrencode -o /usr/share/nginx/html/M$UUID.png $vmlink
-qrencode -o /usr/share/nginx/html/L$UUID.png $vllink
-qrencode -o /usr/share/nginx/html/T$UUID.png $trlink
-
 # 方便查找CF地址
 echo $argo_url > /usr/share/nginx/html/cf.txt
 
-cp /etc/debian_version /usr/share/nginx/html
-echo $(whereis sshd) >>  /usr/share/nginx/html/qwq.txt
-echo $(/etc/init.d/ssh status) >>  /usr/share/nginx/html/qwq.txt
-
-# 配置并启动SSH服务器
-KEYS_FILE="/root/.ssh/authorized_keys"
-SSH_PUBKEY=${SSH_PUBKEY:-'dummy'}
-mkdir -p /root/.ssh
-echo ${SSH_PUBKEY} >> ${KEYS_FILE}
-chmod 644 ${KEYS_FILE}
-/etc/init.d/ssh restart
-
-# 安装Warp
-wget https://pkg.cloudflareclient.com/uploads/cloudflare_warp_2023_3_398_1_amd64_002e48d521.deb
-dpkg -i cloudflare_warp_2023_3_398_1_amd64_002e48d521.deb
-apt --fix-broken install
-mkdir -p /root/.local/share/warp
-echo "yes" > /root/.local/share/warp/accepted-tos.txt
+# 启动Warp
 warp-svc &
 
 # 输出配置文件到$UUID.json
@@ -109,6 +92,15 @@ cat > /usr/share/nginx/html/$UUID.json<<-EOF
   ]
 }
 EOF
+
+# 生成qr码以及网页
+vmlink=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"Argo_xray_vmess\",\"add\":\"$argo_url\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$argo_url\",\"path\":\"$VMESS_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
+vllink=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$argo_url":443?encryption=none&security=tls&type=ws&host="$argo_url"&path="$VLESS_WSPATH"?ed=2048#Argo_xray_vless"
+trlink=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$argo_url":443?security=tls&type=ws&host="$argo_url"&path="$TROJAN_WSPATH"?ed2048#Argo_xray_trojan"
+
+qrencode -o /usr/share/nginx/html/M$UUID.png $vmlink
+qrencode -o /usr/share/nginx/html/L$UUID.png $vllink
+qrencode -o /usr/share/nginx/html/T$UUID.png $trlink
 
 cat > /usr/share/nginx/html/$UUID.html<<-EOF
 <!DOCTYPE html>
