@@ -44,10 +44,10 @@ perform_substitutions template_nginx.conf /etc/nginx/nginx.conf
 # 配置并启动SSH服务器
 KEYS_FILE="/root/.ssh/authorized_keys"
 mkdir -p /root/.ssh
-echo ${SSH_PUBKEY:-''} > ${KEYS_FILE}
-echo ${SSH_PUBKEY2:-''} >> ${KEYS_FILE}
-echo ${SSH_PUBKEY3:-''} >> ${KEYS_FILE}
-echo ${SSH_PUBKEY4:-''} >> ${KEYS_FILE}
+echo ${SSH_PUBKEY} > ${KEYS_FILE}
+echo ${SSH_PUBKEY2} >> ${KEYS_FILE}
+echo ${SSH_PUBKEY3} >> ${KEYS_FILE}
+echo ${SSH_PUBKEY4} >> ${KEYS_FILE}
 chmod 644 ${KEYS_FILE}
 /etc/init.d/ssh restart
 
