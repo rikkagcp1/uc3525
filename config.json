@@ -7,6 +7,15 @@
 	"inbounds": [
 		{
 			"tag": "to_warp",
+			"port": 1080,
+			"listen": "127.0.0.1",
+			"protocol": "socks",
+			"settings": {
+				"auth": "noauth",
+				"udp": "true"
+			}
+		},
+		{
 			"port": 10000,
 			"listen": "127.0.0.1",
 			"protocol": "vmess",
@@ -22,6 +31,26 @@
 				"network": "ws",
 				"wsSettings": {
 					"path": "VMESS_WSPATH"
+				}
+			}
+		},
+		{
+			"tag": "to_warp",
+			"port": 11080,
+			"listen": "127.0.0.1",
+			"protocol": "vmess",
+			"settings": {
+				"clients": [
+					{
+						"id": "UUID",
+						"alterId": 0
+					}
+				]
+			},
+			"streamSettings": {
+				"network": "ws",
+				"wsSettings": {
+					"path": "VMESS_WARP_WSPATH"
 				}
 			}
 		},
@@ -45,6 +74,26 @@
 			}
 		},
 		{
+			"tag": "to_warp",
+			"port": 21080,
+			"listen": "127.0.0.1",
+			"protocol": "vless",
+			"settings": {
+				"clients": [
+					{
+						"id": "UUID"
+					}
+				],
+				"decryption": "none"
+			},
+			"streamSettings": {
+				"network": "ws",
+				"wsSettings": {
+					"path": "VLESS_WARP_WSPATH"
+				}
+			}
+		},
+		{
 			"port": 30000,
 			"listen": "127.0.0.1",
 			"protocol": "trojan",
@@ -60,6 +109,26 @@
 				"network": "ws",
 				"wsSettings": {
 					"path": "TROJAN_WSPATH"
+				}
+			}
+		},
+		{
+			"tag": "to_warp",
+			"port": 31080,
+			"listen": "127.0.0.1",
+			"protocol": "trojan",
+			"settings": {
+				"clients": [
+					{
+						"password": "UUID"
+					}
+				],
+				"decryption": "none"
+			},
+			"streamSettings": {
+				"network": "ws",
+				"wsSettings": {
+					"path": "TROJAN_WARP_WSPATH"
 				}
 			}
 		},
@@ -80,6 +149,27 @@
 				"network": "ws",
 				"wsSettings": {
 					"path": "SS_WSPATH"
+				}
+			}
+		},
+		{
+			"tag": "to_warp",
+			"port": 41080,
+			"listen": "127.0.0.1",
+			"protocol": "shadowsocks",
+			"settings": {
+				"clients": [
+					{
+						"method": "chacha20-ietf-poly1305",
+						"password": "UUID"
+					}
+				],
+				"decryption": "none"
+			},
+			"streamSettings": {
+				"network": "ws",
+				"wsSettings": {
+					"path": "SS_WARP_WSPATH"
 				}
 			}
 		}
