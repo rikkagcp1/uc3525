@@ -98,6 +98,9 @@ vmlink=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"Argo
 vllink=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$argo_url":443?encryption=none&security=tls&type=ws&host="$argo_url"&path="$VLESS_WSPATH"?ed=2048#Argo_xray_vless"
 trlink=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$argo_url":443?security=tls&type=ws&host="$argo_url"&path="$TROJAN_WSPATH"?ed2048#Argo_xray_trojan"
 
+# 产生订阅
+echo "$vmlink" | base64 -w 0 > /usr/share/nginx/html/subs.txt
+
 qrencode -o /usr/share/nginx/html/M$UUID.png $vmlink
 qrencode -o /usr/share/nginx/html/L$UUID.png $vllink
 qrencode -o /usr/share/nginx/html/T$UUID.png $trlink
