@@ -13,10 +13,29 @@ TROJAN_WARP_WSPATH=${TROJAN_WARP_WSPATH:-'/trojan_warp'}
 SS_WSPATH=${SS_WSPATH:-'/shadowsocks'}
 SS_WARP_WSPATH=${SS_WARP_WSPATH:-'/shadowsocks_warp'}
 
+VAR_NAMES=("UUID" "VMESS_WSPATH" "VMESS_WARP_WSPATH" "VLESS_WSPATH" "VLESS_WARP_WSPATH" "TROJAN_WSPATH" "TROJAN_WARP_WSPATH" "SS_WSPATH" "SS_WARP_WSPATH")
+
+# Function to perform variable substitution in a text file
+perform_variable_substitution() {
+    local text_file="$1"  # Text file to be processed
+    shift  # Shift the arguments to remove the text_file argument
+    local var_names=("$@")  # Array of variable names
+
+    # Iterate over each variable name in the array
+    for var_name in "${var_names[@]}"; do
+        # Get the value of the variable
+        local var_value="${!var_name}"
+        local escaped_value="${var_value//\//\\/}"  # Escape forward slashes
+
+        # Replace the placeholder with the variable value in the text file
+        sed -i "s/#${var_name}#/${escaped_value}/g" "$text_file"
+    done
+}
+
 perform_substitutions() {
     [ -f "$2" ] && rm "$2"
     cp "$1" "$2"
-    sed -i "s#UUID#$UUID#g;s#VMESS_WSPATH#${VMESS_WSPATH}#g;s#VMESS_WARP_WSPATH#${VMESS_WARP_WSPATH}#g;s#VLESS_WSPATH#${VLESS_WSPATH}#g;s#VLESS_WARP_WSPATH#${VLESS_WARP_WSPATH}#g;s#TROJAN_WSPATH#${TROJAN_WSPATH}#g;s#TROJAN_WARP_WSPATH#${TROJAN_WARP_WSPATH}#g;s#SS_WSPATH#${SS_WSPATH}#g;s#SS_WARP_WSPATH#${SS_WARP_WSPATH}#g" "$2"
+    perform_variable_substitution "$2" "${VAR_NAMES[@]}"
 }
 
 perform_substitutions template_config.json config.json
@@ -52,10 +71,11 @@ rm -f config.json
 
 # 启用 Argo，并输出节点日志
 cloudflared tunnel --url http://localhost:80 --no-autoupdate > argo.log 2>&1 &
-sleep 5 && argo_url=$(cat argo.log | grep -oE "https://.*[a-z]+cloudflare.com" | sed "s#https://##")
+sleep 5 && ARGO_URL=$(cat argo.log | grep -oE "https://.*[a-z]+cloudflare.com" | sed "s#https://##")
+VAR_NAMES=("${VAR_NAMES[@]}" "ARGO_URL")
 
 # 方便查找CF地址
-echo $argo_url > /usr/share/nginx/html/cf.txt
+echo $ARGO_URL > /usr/share/nginx/html/cf.txt
 
 # 启动Warp, 需要在Dockerfile中启用安装Warp官方客户端
 # warp-svc &
@@ -65,62 +85,18 @@ echo $argo_url > /usr/share/nginx/html/cf.txt
 # warp-cli set-proxy-port 1080
 # warp-cli connect
 
-# 输出v2ray vmess客户端配置文件到$UUID.json
-cat > /usr/share/nginx/html/$UUID.json<<-EOF
-{
-  "log": {
-    "loglevel": "debug"
-  },
-  "inbounds": [
-    {
-      "port": 1080,
-      "protocol": "socks",
-      "sniffing": {
-        "enabled": true,
-        "destOverride": [ "http", "tls" ]
-      },
-      "settings": {
-        "auth": "noauth",
-        "udp": true
-      }
-    }
-  ],
-  "outbounds": [
-    {
-      "protocol": "vmess",
-      "settings": {
-        "vnext": [
-          {
-            "address": "$argo_url",
-            "port": 443,
-            "users": [
-              {
-                "id": "$UUID",
-                "alterId": 0
-              }
-            ]
-          }
-        ]
-      },
-      "streamSettings": {
-        "network": "ws",
-        "security": "tls",
-        "wsSettings": {
-          "path": "/vmess"
-        }
-      }
-    }
-  ]
-}
-EOF
+# 输出vmess客户端配置文件到$UUID.json
+CLIENT_JSON_PATH="/usr/share/nginx/html/$UUID.json"
+cp template_client_config.json $CLIENT_JSON_PATH
+perform_variable_substitution $CLIENT_JSON_PATH ${VAR_NAMES[@]}
 
 # 生成qr码以及网页
-vmlink=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"${DISPLAY_NAME}vmess\",\"add\":\"$argo_url\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$argo_url\",\"path\":\"$VMESS_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
-vmlink_warp=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"${DISPLAY_NAME}vmess\",\"add\":\"$argo_url\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$argo_url\",\"path\":\"$VMESS_WARP_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
-vllink=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$argo_url":443?encryption=none&security=tls&type=ws&host="$argo_url"&path="$VLESS_WSPATH"?ed=2048#${DISPLAY_NAME}vless"
-vllink_warp=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$argo_url":443?encryption=none&security=tls&type=ws&host="$argo_url"&path="$VLESS_WARP_WSPATH"?ed=2048#${DISPLAY_NAME}vless"
-trlink=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$argo_url":443?security=tls&type=ws&host="$argo_url"&path="$TROJAN_WSPATH"?ed2048#${DISPLAY_NAME}trojan"
-trlink_warp=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$argo_url":443?security=tls&type=ws&host="$argo_url"&path="$TROJAN_WARP_WSPATH"?ed2048#${DISPLAY_NAME}trojan"
+vmlink=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"${DISPLAY_NAME}vmess\",\"add\":\"$ARGO_URL\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$ARGO_URL\",\"path\":\"$VMESS_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
+vmlink_warp=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"${DISPLAY_NAME}vmess\",\"add\":\"$ARGO_URL\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$ARGO_URL\",\"path\":\"$VMESS_WARP_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
+vllink=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$ARGO_URL":443?encryption=none&security=tls&type=ws&host="$ARGO_URL"&path="$VLESS_WSPATH"?ed=2048#${DISPLAY_NAME}vless"
+vllink_warp=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$ARGO_URL":443?encryption=none&security=tls&type=ws&host="$ARGO_URL"&path="$VLESS_WARP_WSPATH"?ed=2048#${DISPLAY_NAME}vless"
+trlink=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$ARGO_URL":443?security=tls&type=ws&host="$ARGO_URL"&path="$TROJAN_WSPATH"?ed2048#${DISPLAY_NAME}trojan"
+trlink_warp=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$ARGO_URL":443?security=tls&type=ws&host="$ARGO_URL"&path="$TROJAN_WARP_WSPATH"?ed2048#${DISPLAY_NAME}trojan"
 
 # 产生订阅
 echo -e "$vmlink\n$vmlink_warp\n$vllink\n$vllink_warp\n$trlink\n$trlink_warp" | base64 -w 0 > /usr/share/nginx/html/$UUID.txt
@@ -132,64 +108,12 @@ qrencode -o /usr/share/nginx/html/LW$UUID.png $vllink_warp
 qrencode -o /usr/share/nginx/html/T$UUID.png $trlink
 qrencode -o /usr/share/nginx/html/TW$UUID.png $trlink_warp
 
-cat > /usr/share/nginx/html/$UUID.html<<-EOF
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>Argo-xray-paas</title>
-    <style type="text/css">
-        body {
-            font-family: Geneva, Arial, Helvetica, san-serif;
-        }
+HTML_PATH="/usr/share/nginx/html/$UUID.html"
+VAR_NAMES=("${VAR_NAMES[@]}" "vmlink" "vmlink_warp" "vllink" "vllink_warp" "trlink" "trlink_warp")
+cp template_webpage.html $HTML_PATH
+perform_variable_substitution $HTML_PATH ${VAR_NAMES[@]}
 
-        div {
-            margin: 0 auto;
-            text-align: left;
-            white-space: pre-wrap;
-            word-break: break-all;
-            max-width: 80%;
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
-<body bgcolor="#FFFFFF" text="#000000">
-    <div><font color="#009900"><b>VMESS协议链接(VPS出口)：</b></font></div>
-    <div>$vmlink</div>
-    <div><img src="/M$UUID.png"></div>
-    <div><font color="#009900"><b>VMESS协议链接(Warp出口)：</b></font></div>
-    <div>$vmlink_warp</div>
-    <div><img src="/MW$UUID.png"></div>
-
-    <div><font color="#009900"><b>VLESS协议链接(VPS出口)：</b></font></div>
-    <div>$vllink</div>
-    <div><img src="/L$UUID.png"></div>
-    <div><font color="#009900"><b>VLESS协议链接(Warp出口)：</b></font></div>
-    <div>$vllink_warp</div>
-    <div><img src="/LW$UUID.png"></div>
-
-    <div><font color="#009900"><b>TROJAN协议链接(VPS出口)：</b></font></div>
-    <div>$trlink</div>
-    <div><img src="/T$UUID.png"></div>
-    <div><font color="#009900"><b>TROJAN协议链接(Warp出口)：</b></font></div>
-    <div>$trlink_warp</div>
-    <div><img src="/TW$UUID.png"></div>
-
-    <div><font color="#009900"><b>SS协议明文：</b></font></div>
-    <div>服务器地址：$argo_url</div>
-    <div>端口：443</div>
-    <div>密码：$UUID</div>
-    <div>加密方式：chacha20-ietf-poly1305</div>
-    <div>传输协议：ws</div>
-    <div>host：$argo_url</div>
-    <div>path路径：$SS_WSPATH?ed=2048</div>
-    <div>path全程Warp路径：$SS_WARP_WSPATH?ed=2048</div>
-    <div>TLS：开启</div>
-</body>
-</html>
-EOF
-
-echo $argo_url
+echo $ARGO_URL
 
 nginx
 base64 -d config > config.json

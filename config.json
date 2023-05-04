@@ -22,7 +22,7 @@
 			"settings": {
 				"clients": [
 					{
-						"id": "UUID",
+						"id": "#UUID#",
 						"alterId": 0
 					}
 				]
@@ -30,7 +30,7 @@
 			"streamSettings": {
 				"network": "ws",
 				"wsSettings": {
-					"path": "VMESS_WSPATH"
+					"path": "#VMESS_WSPATH#"
 				}
 			}
 		},
@@ -42,7 +42,7 @@
 			"settings": {
 				"clients": [
 					{
-						"id": "UUID",
+						"id": "#UUID#",
 						"alterId": 0
 					}
 				]
@@ -50,7 +50,7 @@
 			"streamSettings": {
 				"network": "ws",
 				"wsSettings": {
-					"path": "VMESS_WARP_WSPATH"
+					"path": "#VMESS_WARP_WSPATH#"
 				}
 			}
 		},
@@ -61,7 +61,7 @@
 			"settings": {
 				"clients": [
 					{
-						"id": "UUID"
+						"id": "#UUID#"
 					}
 				],
 				"decryption": "none"
@@ -69,7 +69,7 @@
 			"streamSettings": {
 				"network": "ws",
 				"wsSettings": {
-					"path": "VLESS_WSPATH"
+					"path": "#VLESS_WSPATH#"
 				}
 			}
 		},
@@ -81,7 +81,7 @@
 			"settings": {
 				"clients": [
 					{
-						"id": "UUID"
+						"id": "#UUID#"
 					}
 				],
 				"decryption": "none"
@@ -89,7 +89,7 @@
 			"streamSettings": {
 				"network": "ws",
 				"wsSettings": {
-					"path": "VLESS_WARP_WSPATH"
+					"path": "#VLESS_WARP_WSPATH#"
 				}
 			}
 		},
@@ -100,7 +100,7 @@
 			"settings": {
 				"clients": [
 					{
-						"password": "UUID"
+						"password": "#UUID#"
 					}
 				],
 				"decryption": "none"
@@ -108,7 +108,7 @@
 			"streamSettings": {
 				"network": "ws",
 				"wsSettings": {
-					"path": "TROJAN_WSPATH"
+					"path": "#TROJAN_WSPATH#"
 				}
 			}
 		},
@@ -120,7 +120,7 @@
 			"settings": {
 				"clients": [
 					{
-						"password": "UUID"
+						"password": "#UUID#"
 					}
 				],
 				"decryption": "none"
@@ -128,7 +128,7 @@
 			"streamSettings": {
 				"network": "ws",
 				"wsSettings": {
-					"path": "TROJAN_WARP_WSPATH"
+					"path": "#TROJAN_WARP_WSPATH#"
 				}
 			}
 		},
@@ -140,7 +140,7 @@
 				"clients": [
 					{
 						"method": "chacha20-ietf-poly1305",
-						"password": "UUID"
+						"password": "#UUID#"
 					}
 				],
 				"decryption": "none"
@@ -148,7 +148,7 @@
 			"streamSettings": {
 				"network": "ws",
 				"wsSettings": {
-					"path": "SS_WSPATH"
+					"path": "#SS_WSPATH#"
 				}
 			}
 		},
@@ -161,7 +161,7 @@
 				"clients": [
 					{
 						"method": "chacha20-ietf-poly1305",
-						"password": "UUID"
+						"password": "#UUID#"
 					}
 				],
 				"decryption": "none"
@@ -169,7 +169,7 @@
 			"streamSettings": {
 				"network": "ws",
 				"wsSettings": {
-					"path": "SS_WARP_WSPATH"
+					"path": "#SS_WARP_WSPATH#"
 				}
 			}
 		}

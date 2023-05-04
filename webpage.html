@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Argo-xray-paas</title>
+    <style type="text/css">
+        body {
+            font-family: Geneva, Arial, Helvetica, san-serif;
+        }
+
+        div {
+            margin: 0 auto;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-width: 80%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+    <a href="/#UUID#.json">VMESS客户端JSON配置文件</a>
+    <div><font color="#009900"><b>VMESS协议链接(VPS出口)：</b></font></div>
+    <div>#vmlink#</div>
+    <div><img src="/M#UUID#.png"></div>
+    <div><font color="#009900"><b>VMESS协议链接(Warp出口)：</b></font></div>
+    <div>#vmlink_warp#</div>
+    <div><img src="/MW#UUID#.png"></div>
+
+    <div><font color="#009900"><b>VLESS协议链接(VPS出口)：</b></font></div>
+    <div>#vllink#</div>
+    <div><img src="/L#UUID#.png"></div>
+    <div><font color="#009900"><b>VLESS协议链接(Warp出口)：</b></font></div>
+    <div>#vllink_warp#</div>
+    <div><img src="/LW#UUID#.png"></div>
+
+    <div><font color="#009900"><b>TROJAN协议链接(VPS出口)：</b></font></div>
+    <div>#trlink#</div>
+    <div><img src="/T#UUID#.png"></div>
+    <div><font color="#009900"><b>TROJAN协议链接(Warp出口)：</b></font></div>
+    <div>#trlink_warp#</div>
+    <div><img src="/TW#UUID#.png"></div>
+
+    <div><font color="#009900"><b>SS协议明文：</b></font></div>
+    <div>服务器地址：#ARGO_URL#</div>
+    <div>端口：443</div>
+    <div>密码：#UUID#</div>
+    <div>加密方式：chacha20-ietf-poly1305</div>
+    <div>传输协议：ws</div>
+    <div>host：#ARGO_URL#</div>
+    <div>path路径(VPS出口)：#SS_WSPATH#?ed=2048</div>
+    <div>path路径(Warp出口)：#SS_WARP_WSPATH#?ed=2048</div>
+    <div>TLS：开启</div>
+</body>
+</html>

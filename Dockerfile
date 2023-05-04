@@ -3,8 +3,10 @@ EXPOSE 80
 WORKDIR /app
 USER root
 
+COPY webpage.html ./template_webpage.html
 COPY nginx.conf ./template_nginx.conf
 COPY config.json ./template_config.json
+COPY client_config.json ./template_client_config.json
 COPY entrypoint.sh ./
 COPY mikutap.zip ./
 
