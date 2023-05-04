@@ -1,35 +1,47 @@
 #!/usr/bin/env bash
 
+DISPLAY_NAME=${DISPLAY_NAME:-'Argo_xray_'}
+
 # 定义 UUID 及 伪装路径,请自行修改.(注意:伪装路径以 / 符号开始,为避免不必要的麻烦,请不要使用特殊符号.)
 UUID=${UUID:-'de04add9-5c68-8bab-950c-08cd5320df18'}
 VMESS_WSPATH=${VMESS_WSPATH:-'/vmess'}
-VMESS_WARP_WSPATH=${VMESS_WSPATH:-'/vmess_warp'}
+VMESS_WARP_WSPATH=${VMESS_WARP_WSPATH:-'/vmess_warp'}
 VLESS_WSPATH=${VLESS_WSPATH:-'/vless'}
-VLESS_WARP_WSPATH=${VLESS_WSPATH:-'/vless_warp'}
+VLESS_WARP_WSPATH=${VLESS_WARP_WSPATH:-'/vless_warp'}
 TROJAN_WSPATH=${TROJAN_WSPATH:-'/trojan'}
-TROJAN_WARP_WSPATH=${TROJAN_WSPATH:-'/trojan_warp'}
+TROJAN_WARP_WSPATH=${TROJAN_WARP_WSPATH:-'/trojan_warp'}
 SS_WSPATH=${SS_WSPATH:-'/shadowsocks'}
-SS_WARP_WSPATH=${SS_WSPATH:-'/shadowsocks_warp'}
-sed -i "s#UUID#$UUID#g;s#VMESS_WSPATH#${VMESS_WSPATH}#g;s#VLESS_WSPATH#${VLESS_WSPATH}#g;s#TROJAN_WSPATH#${TROJAN_WSPATH}#g;s#SS_WSPATH#${SS_WSPATH}#g" config.json
-sed -i "s#VMESS_WSPATH#${VMESS_WSPATH}#g;s#VLESS_WSPATH#${VLESS_WSPATH}#g;s#TROJAN_WSPATH#${TROJAN_WSPATH}#g;s#SS_WSPATH#${SS_WSPATH}#g" /etc/nginx/nginx.conf
+SS_WARP_WSPATH=${SS_WARP_WSPATH:-'/shadowsocks_warp'}
+
+perform_substitutions() {
+    [ -f "$2" ] && rm "$2"
+    cp "$1" "$2"
+    sed -i "s#UUID#$UUID#g;s#VMESS_WSPATH#${VMESS_WSPATH}#g;s#VMESS_WARP_WSPATH#${VMESS_WARP_WSPATH}#g;s#VLESS_WSPATH#${VLESS_WSPATH}#g;s#VLESS_WARP_WSPATH#${VLESS_WARP_WSPATH}#g;s#TROJAN_WSPATH#${TROJAN_WSPATH}#g;s#TROJAN_WARP_WSPATH#${TROJAN_WARP_WSPATH}#g;s#SS_WSPATH#${SS_WSPATH}#g;s#SS_WARP_WSPATH#${SS_WARP_WSPATH}#g" "$2"
+}
+
+perform_substitutions template_config.json config.json
+perform_substitutions template_nginx.conf /etc/nginx/nginx.conf
 
 # 配置并启动SSH服务器
 KEYS_FILE="/root/.ssh/authorized_keys"
-SSH_PUBKEY=${SSH_PUBKEY:-'dummy'}
 mkdir -p /root/.ssh
-echo ${SSH_PUBKEY} >> ${KEYS_FILE}
+echo ${SSH_PUBKEY:-'dummy'} > ${KEYS_FILE}
+echo ${SSH_PUBKEY2:-'dummy'} > ${KEYS_FILE}
+echo ${SSH_PUBKEY3:-'dummy'} > ${KEYS_FILE}
+echo ${SSH_PUBKEY4:-'dummy'} > ${KEYS_FILE}
 chmod 644 ${KEYS_FILE}
 /etc/init.d/ssh restart
 
 # 设置 nginx 伪装站
 rm -rf /usr/share/nginx/*
-wget https://gitlab.com/Misaka-blog/xray-paas/-/raw/main/mikutap.zip -O /usr/share/nginx/mikutap.zip
-unzip -o "/usr/share/nginx/mikutap.zip" -d /usr/share/nginx/html
-rm -f /usr/share/nginx/mikutap.zip
+unzip -o "./mikutap.zip" -d /usr/share/nginx/html
 
 # 伪装 xray 执行文件
 RELEASE_RANDOMNESS=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 6)
+[ -f "exec.txt" ] && RELEASE_RANDOMNESS=$(<exec.txt tr -d '\n') || echo -n $RELEASE_RANDOMNESS > exec.txt
 mv xray ${RELEASE_RANDOMNESS}
+[ -f "geoip.dat" ] && rm "geoip.dat"
+[ -f "geosite.dat" ] && rm "geosite.dat"
 wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
 wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
 cat config.json | base64 > config
@@ -53,7 +65,7 @@ echo $argo_url > /usr/share/nginx/html/cf.txt
 # warp-cli set-proxy-port 1080
 # warp-cli connect
 
-# 输出配置文件到$UUID.json
+# 输出v2ray vmess客户端配置文件到$UUID.json
 cat > /usr/share/nginx/html/$UUID.json<<-EOF
 {
   "log": {
@@ -103,16 +115,22 @@ cat > /usr/share/nginx/html/$UUID.json<<-EOF
 EOF
 
 # 生成qr码以及网页
-vmlink=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"Argo_xray_vmess\",\"add\":\"$argo_url\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$argo_url\",\"path\":\"$VMESS_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
-vllink=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$argo_url":443?encryption=none&security=tls&type=ws&host="$argo_url"&path="$VLESS_WSPATH"?ed=2048#Argo_xray_vless"
-trlink=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$argo_url":443?security=tls&type=ws&host="$argo_url"&path="$TROJAN_WSPATH"?ed2048#Argo_xray_trojan"
+vmlink=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"${DISPLAY_NAME}vmess\",\"add\":\"$argo_url\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$argo_url\",\"path\":\"$VMESS_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
+vmlink_warp=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"${DISPLAY_NAME}vmess\",\"add\":\"$argo_url\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$argo_url\",\"path\":\"$VMESS_WARP_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
+vllink=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$argo_url":443?encryption=none&security=tls&type=ws&host="$argo_url"&path="$VLESS_WSPATH"?ed=2048#${DISPLAY_NAME}vless"
+vllink_warp=$(echo -e '\x76\x6c\x65\x73\x73')"://"$UUID"@"$argo_url":443?encryption=none&security=tls&type=ws&host="$argo_url"&path="$VLESS_WARP_WSPATH"?ed=2048#${DISPLAY_NAME}vless"
+trlink=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$argo_url":443?security=tls&type=ws&host="$argo_url"&path="$TROJAN_WSPATH"?ed2048#${DISPLAY_NAME}trojan"
+trlink_warp=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$argo_url":443?security=tls&type=ws&host="$argo_url"&path="$TROJAN_WARP_WSPATH"?ed2048#${DISPLAY_NAME}trojan"
 
 # 产生订阅
-echo -e "$vmlink\n$vllink\n$trlink" | base64 -w 0 > /usr/share/nginx/html/$UUID.txt
+echo -e "$vmlink\n$vmlink_warp\n$vllink\n$vllink_warp\n$trlink\n$trlink_warp" | base64 -w 0 > /usr/share/nginx/html/$UUID.txt
 
 qrencode -o /usr/share/nginx/html/M$UUID.png $vmlink
+qrencode -o /usr/share/nginx/html/MW$UUID.png $vmlink_warp
 qrencode -o /usr/share/nginx/html/L$UUID.png $vllink
+qrencode -o /usr/share/nginx/html/LW$UUID.png $vllink_warp
 qrencode -o /usr/share/nginx/html/T$UUID.png $trlink
+qrencode -o /usr/share/nginx/html/TW$UUID.png $trlink_warp
 
 cat > /usr/share/nginx/html/$UUID.html<<-EOF
 <!DOCTYPE html>
@@ -136,33 +154,28 @@ cat > /usr/share/nginx/html/$UUID.html<<-EOF
     </style>
 </head>
 <body bgcolor="#FFFFFF" text="#000000">
-    <div>
-        <font color="#009900"><b>VMESS协议链接：</b></font>
-    </div>
+    <div><font color="#009900"><b>VMESS协议链接(VPS出口)：</b></font></div>
     <div>$vmlink</div>
-    <div>
-        <font color="#009900"><b>VMESS协议二维码：</b></font>
-    </div>
     <div><img src="/M$UUID.png"></div>
-    <div>
-        <font color="#009900"><b>VLESS协议链接：</b></font>
-    </div>
+    <div><font color="#009900"><b>VMESS协议链接(Warp出口)：</b></font></div>
+    <div>$vmlink_warp</div>
+    <div><img src="/MW$UUID.png"></div>
+
+    <div><font color="#009900"><b>VLESS协议链接(VPS出口)：</b></font></div>
     <div>$vllink</div>
-    <div>
-        <font color="#009900"><b>VLESS协议二维码：</b></font>
-    </div>
     <div><img src="/L$UUID.png"></div>
-    <div>
-        <font color="#009900"><b>TROJAN协议链接：</b></font>
-    </div>
+    <div><font color="#009900"><b>VLESS协议链接(Warp出口)：</b></font></div>
+    <div>$vllink_warp</div>
+    <div><img src="/LW$UUID.png"></div>
+
+    <div><font color="#009900"><b>TROJAN协议链接(VPS出口)：</b></font></div>
     <div>$trlink</div>
-    <div>
-        <font color="#009900"><b>TROJAN协议二维码：</b></font>
-    </div>
     <div><img src="/T$UUID.png"></div>
-    <div>
-        <font color="#009900"><b>SS协议明文：</b></font>
-    </div>
+    <div><font color="#009900"><b>TROJAN协议链接(Warp出口)：</b></font></div>
+    <div>$trlink_warp</div>
+    <div><img src="/TW$UUID.png"></div>
+
+    <div><font color="#009900"><b>SS协议明文：</b></font></div>
     <div>服务器地址：$argo_url</div>
     <div>端口：443</div>
     <div>密码：$UUID</div>
@@ -170,10 +183,13 @@ cat > /usr/share/nginx/html/$UUID.html<<-EOF
     <div>传输协议：ws</div>
     <div>host：$argo_url</div>
     <div>path路径：$SS_WSPATH?ed=2048</div>
+    <div>path全程Warp路径：$SS_WARP_WSPATH?ed=2048</div>
     <div>TLS：开启</div>
 </body>
 </html>
 EOF
+
+echo $argo_url
 
 nginx
 base64 -d config > config.json

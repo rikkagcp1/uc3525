@@ -3,9 +3,10 @@ EXPOSE 80
 WORKDIR /app
 USER root
 
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY config.json ./
+COPY nginx.conf ./template_nginx.conf
+COPY config.json ./template_config.json
 COPY entrypoint.sh ./
+COPY mikutap.zip ./
 
 RUN apt-get update && apt-get install -y wget unzip qrencode iproute2 systemctl openssh-server && \
     wget -O cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \

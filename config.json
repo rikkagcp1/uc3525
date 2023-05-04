@@ -12,7 +12,7 @@
 			"protocol": "socks",
 			"settings": {
 				"auth": "noauth",
-				"udp": "true"
+				"udp": true
 			}
 		},
 		{
@@ -35,7 +35,7 @@
 			}
 		},
 		{
-			"tag": "to_warp",
+			"tag": "from_vmess_warp",
 			"port": 11080,
 			"listen": "127.0.0.1",
 			"protocol": "vmess",
@@ -74,7 +74,7 @@
 			}
 		},
 		{
-			"tag": "to_warp",
+			"tag": "from_vless_warp",
 			"port": 21080,
 			"listen": "127.0.0.1",
 			"protocol": "vless",
@@ -113,7 +113,7 @@
 			}
 		},
 		{
-			"tag": "to_warp",
+			"tag": "from_trojan_warp",
 			"port": 31080,
 			"listen": "127.0.0.1",
 			"protocol": "trojan",
@@ -153,7 +153,7 @@
 			}
 		},
 		{
-			"tag": "to_warp",
+			"tag": "from_ss_warp",
 			"port": 41080,
 			"listen": "127.0.0.1",
 			"protocol": "shadowsocks",
@@ -209,7 +209,7 @@
 				"outboundTag": "WARP"
 			}, {
 				"type": "field",
-				"inboundTag": ["to_warp"],
+				"inboundTag": ["to_warp", "from_vmess_warp", "from_vless_warp", "from_trojan_warp", "from_ss_warp"],
 				"outboundTag": "WARP"
 			}
 		]
