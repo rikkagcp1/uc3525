@@ -61,17 +61,48 @@ RELEASE_RANDOMNESS=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 6)
 mv xray ${RELEASE_RANDOMNESS}
 [ -f "geoip.dat" ] && rm "geoip.dat"
 [ -f "geosite.dat" ] && rm "geosite.dat"
-wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
-wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
+wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
 cat config.json | base64 > config
 rm -f config.json
 
 # 如果有设置哪吒探针三个变量,会安装。如果不填或者不全,则不会安装
 [ -n "${NEZHA_SERVER}" ] && [ -n "${NEZHA_PORT}" ] && [ -n "${NEZHA_KEY}" ] && wget https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh -O nezha.sh && chmod +x nezha.sh && ./nezha.sh install_agent ${NEZHA_SERVER} ${NEZHA_PORT} ${NEZHA_KEY}
 
-# 启用 Argo，并输出节点日志
-cloudflared tunnel --url http://localhost:80 --no-autoupdate > argo.log 2>&1 &
-sleep 5 && ARGO_URL=$(cat argo.log | grep -oE "https://.*[a-z]+cloudflare.com" | sed "s#https://##")
+# Start Cloudflare free tunnel
+# Time to wait before checking the URL
+CFTUNNEL_WAIT=${CFTUNNEL_WAIT:-5}
+# Set default retry limit to 3
+CFTUNNEL_RETRY_LIMIT=${CFTUNNEL_RETRY_LIMIT:-3}
+# Time to wait before the next attempt
+CFTUNNEL_RETRY_DELAY=${CFTUNNEL_RETRY_DELAY:-5}
+
+counter=0
+while true
+do
+    ((counter++))
+
+    # Attempt to create the tunnel
+    cloudflared tunnel --url http://localhost:80 --no-autoupdate > argo.log 2>&1 &
+    sleep $CFTUNNEL_WAIT
+    ARGO_URL=$(cat argo.log | grep -oE "https://.*[a-z]+cloudflare.com" | sed "s#https://##")
+
+    # Check if ARGO_URL is empty and retry if necessary
+    if [[ -z $ARGO_URL ]]; then
+        echo "ERROR: Failed to start Cloudflare tunnel. Retrying in $CFTUNNEL_RETRY_DELAY seconds..."
+        sleep $CFTUNNEL_RETRY_DELAY
+    else
+        break
+    fi
+
+    # Exit loop if retry limit is reached
+    if [[ $counter -ge $CFTUNNEL_RETRY_LIMIT ]] && [[ $CFTUNNEL_RETRY_LIMIT -ne 0 ]]; then
+        ARGO_URL="Unable to obtain Cloudflare Tunnel URL"
+        echo "ERROR: Failed to start Cloudflare tunnel. Maximum retry limit reached."
+        break
+    fi
+done
+
 VAR_NAMES=("${VAR_NAMES[@]}" "ARGO_URL")
 
 # 方便查找CF地址
