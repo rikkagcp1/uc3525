@@ -3,11 +3,16 @@ EXPOSE 80
 WORKDIR /app
 USER root
 
+COPY supervisor.conf /etc/supervisor/conf.d/supervisord.conf
+
 COPY webpage.html ./template_webpage.html
 COPY nginx.conf ./template_nginx.conf
 COPY config.json ./template_config.json
 COPY client_config.json ./template_client_config.json
 COPY entrypoint.sh ./
+COPY substitution.sh ./
+COPY cfd_refresh.sh ./
+COPY monitor.sh ./
 COPY mikutap.zip ./
 
 RUN apt-get update && apt-get install -y wget unzip qrencode iproute2 systemctl openssh-server && \
@@ -18,6 +23,10 @@ RUN apt-get update && apt-get install -y wget unzip qrencode iproute2 systemctl 
     unzip temp.zip xray && \
     rm -f temp.zip && \
     chmod -v 755 xray entrypoint.sh
+
+# Configure supervisor
+RUN apt-get install -y supervisor && \
+    chmod -v 755 xray monitor.sh cfd_refresh.sh
 
 # Uncomment to install official warp client
 # RUN wget -O warp.deb https://pkg.cloudflareclient.com/uploads/cloudflare_warp_2023_3_398_1_amd64_002e48d521.deb && \
