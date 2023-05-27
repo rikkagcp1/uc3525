@@ -3,6 +3,8 @@
 SUPERVISORCTL_CMD="supervisorctl ${SUPERVISORCTL_ARGS}"
 CFD_REFRESH=${CFD_REFRESH:-'/app/cfd_refresh.sh'}
 CFD_PROC_NAME=${CFD_PROC_NAME:-'cloudflared'}
+WARPSVC_PROC_NAME=${WARPSVC_PROC_NAME:-'warp-svc'}
+WARPCLI_START=${WARPCLI_START:-1}
 VERBOSE_LEVEL=${VERBOSE_LEVEL:-1}
 
 function get_field_from_header() {
@@ -141,10 +143,23 @@ do
 			*)
 			;;
 		esac
+
+	elif [[ $WARPCLI_START > 0 && $PROC == $WARPSVC_PROC_NAME && $EVENT_NAME == 'PROCESS_STATE_RUNNING' ]]; then
+		log_0 'Registering Warp'
+		warp-cli register 1>&2
+
+		# Set custom endpoint if $WARP_END_PT is non-empty
+		if [ -n "$WARP_END_PT" ]; then
+			# warp-cli set-custom-endpoint <xxx> 1>&2
+		fi
+
+		warp-cli set-mode proxy 1>&2
+		warp-cli set-proxy-port 1080 1>&2
+		warp-cli connect 1>&2
+		log_0 'Warp-Cli connected'
 	fi
 
 	echo -ne "RESULT 2\nOK"
 
 	log_1 "-----------------------------------------------------"
 done
-
