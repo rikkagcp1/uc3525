@@ -1,5 +1,7 @@
 # Argo xray for PaaS
 
+back4app可以直接克隆本项目，Codesandbox部署方式参见[Codesandbox.md](Codesandbox.md)
+
 ## 项目特点
 
 * 本项目用于在任意一家 PaaS 云服务商部署 xray ，采用的方案为 Argo + Nginx + WebSocket + VMess/Vless/Trojan/Shadowsocks + TLS
