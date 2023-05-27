@@ -47,15 +47,14 @@ perform_substitutions() {
 
 perform_substitutions template_config.json config.json
 
-# 配置并启动SSH服务器
+# Update keys and restart ssh servers
 KEYS_FILE="/root/.ssh/authorized_keys"
-mkdir -p /root/.ssh
 echo ${SSH_PUBKEY} > ${KEYS_FILE}
 echo ${SSH_PUBKEY2} >> ${KEYS_FILE}
 echo ${SSH_PUBKEY3} >> ${KEYS_FILE}
 echo ${SSH_PUBKEY4} >> ${KEYS_FILE}
-chmod 644 ${KEYS_FILE}
 /etc/init.d/ssh restart
+/etc/init.d/dropbear restart
 
 # Setup Nginx and website
 rm -rf /usr/share/nginx/*
