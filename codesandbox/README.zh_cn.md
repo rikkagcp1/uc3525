@@ -27,6 +27,7 @@ rm -r $REPO_ROOT main.zip
 4. 点击右上角的方块图标，然后选择 "Project settings" （项目设置）. 在左侧的 "Repository" 页面中，取消选择 "Protect current branch" （保护分支内容）。 
 5. 运行如下命令配置工作区workspace (复制粘贴即可)：
 ```
+[ -d .codesandbox ] && rm -rf .codesandbox
 mkdir -p .codesandbox && mv -n * .codesandbox/
 (cd .codesandbox/codesandbox && chmod +x csb.sh && ./csb.sh)
 ```

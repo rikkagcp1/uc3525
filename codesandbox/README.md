@@ -27,6 +27,7 @@ rm -r $REPO_ROOT main.zip
 4. Click on square on the top-right corner of the page, then go to "Project settings". In the "Repository" tab (left hand side), uncheck "Protect current branch".
 5. Run these commands in the terminal (Just copy and paste) to setup the workspace:
 ```
+[ -d .codesandbox ] && rm -rf .codesandbox
 mkdir -p .codesandbox && mv -n * .codesandbox/
 (cd .codesandbox/codesandbox && chmod +x csb.sh && ./csb.sh)
 ```
