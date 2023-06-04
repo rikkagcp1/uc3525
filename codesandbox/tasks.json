@@ -1,0 +1,14 @@
+{
+  "setupTasks": [],
+  "tasks": {
+    "entrypoint": {
+      "name": "entrypoint",
+      "command": "/bin/bash -c \"cd /app && ./entrypoint.sh\"",
+      "preview": {
+        "port": 8080,
+        "prLink": "direct"
+      },
+      "runAtStart": true
+    }
+  }
+}
