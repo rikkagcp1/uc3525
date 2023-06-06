@@ -34,10 +34,10 @@ function log_2() {
 
 declare -A CFD_STATES=(
 	[UNKNOWN]="Unknown State"
-    [LAUNCHED]="Cloudflared has been launched"
-    [CREATED]="Tunnel created"
-    [ADDRESSED]="Tunnel URL retrieved"
-    [EXPIRED]="Tunnel expired"
+	[LAUNCHED]="Cloudflared has been launched"
+	[CREATED]="Tunnel created"
+	[ADDRESSED]="Tunnel URL retrieved"
+	[EXPIRED]="Tunnel expired"
 )
 
 # A global variable that represent the current state
