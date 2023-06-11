@@ -73,8 +73,9 @@ cat config.json | base64 > config
 rm -f config.json
 base64 -d config > config.json
 
-# 如果有设置哪吒探针三个变量,会安装。如果不填或者不全,则不会安装
-[ -n "${NEZHA_SERVER}" ] && [ -n "${NEZHA_PORT}" ] && [ -n "${NEZHA_KEY}" ] && wget https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh -O nezha.sh && chmod +x nezha.sh && ./nezha.sh install_agent ${NEZHA_SERVER} ${NEZHA_PORT} ${NEZHA_KEY}
+# Set "${NEZHA}" to install Nezha Agent (optional), the parameter passed to "./nezha.sh install_agent".
+# Format: "<RPC domain> <RPC port> <Secrete>", append or prepend any flag, if necessary.
+[ -n "${NEZHA}" ] && wget https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh -O nezha.sh && chmod +x nezha.sh && ./nezha.sh install_agent ${NEZHA} &
 
 # 启动Warp, 需要在Dockerfile中启用安装Warp官方客户端
 # warp-svc &
