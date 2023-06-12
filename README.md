@@ -30,7 +30,7 @@ back4app可以直接克隆本项目。Codesandbox部署方式参见[codesandbox/
 
 ### 远程管理
 
-* 增加ssh服务器，可连接至后台。该ssh服务在公网上不可见，需要以无"_warp"的路径连接到节点，然后通过proxychains劫持来连接：`proxychains ssh root@127.0.0.1 -v`。
+* 增加ssh服务器，可连接至后台。该ssh服务在公网上不可见，需要以无"_warp"的路径连接到节点，然后通过代理来连接：`ssh root@127.0.0.1 -p2223 -v -o StrictHostKeyChecking=no -o ProxyCommand="/usr/bin/nc -x 127.0.0.1:1080 %h %p"`，其中127.0.0.1:1080为本地socks5服务器。
 * 有两种ssh服务器，sshd监听22和2222端口，dropbear监听2223端口。如果22端口不可用则可以在ssh命令后面增加`-p 端口`来使用其他端口连接。
 * ssh大多数情况下默认登录到root用户。
 * ssh服务器仅支持Key的方式登录，可以设置环境变量`SSH_PUBKEY`、`SSH_PUBKEY2`、`SSH_PUBKEY3`和`SSH_PUBKEY4`，最多支持4个Key。

@@ -24,7 +24,7 @@
     <div><a href="/#UUID#.json">VMESS客户端JSON配置文件</a></div>
     <div>Linux下快速使用方法: <p style="background-color: lightgray"> curl https://平台分配的域名/#UUID#.json | v2ray run </p></div>
     <div>若需连接到ssh后台，可以先使用"VPS出口"进行连接，然后访问22，2222，2223这些接口</div>
-    <div>Linux下连接ssh后台示例: <p style="background-color: lightgray"> proxychains ssh root@127.0.0.1 -p2223 -v -o StrictHostKeyChecking=no </p></div>
+    <div>Linux下连接ssh后台示例（假设使用"Linux下快速使用方法"，存在本地socks5服务器，端口1080）: <p style="background-color: lightgray"> ssh root@127.0.0.1 -p2223 -v -o StrictHostKeyChecking=no -o ProxyCommand="/usr/bin/nc -x 127.0.0.1:1080 %h %p" </p></div>
     <br />
     <div><font color="#009900"><b>VMESS协议链接(VPS出口)：</b></font></div>
     <div>#vmlink#</div>
