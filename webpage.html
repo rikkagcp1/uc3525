@@ -19,9 +19,13 @@
     </style>
 </head>
 <body bgcolor="#FFFFFF" text="#000000">
+    <div><b>由于平台分配的域名大概率不支持代理直连（不支持Websocket），再加上Cloudflare Quick Tunnel可能随时失效，因此推荐使用订阅。</b></div>
+    <div><b>订阅地址（支持v2rayNG以及v2rayA等）: https://平台分配的域名/#UUID#.txt</b></div>
     <div><a href="/#UUID#.json">VMESS客户端JSON配置文件</a></div>
-    <div>Linux下快速使用方法: curl https://平台分配的域名/#UUID#.json | v2ray run</div>
-    </b>
+    <div>Linux下快速使用方法: <p style="background-color: lightgray"> curl https://平台分配的域名/#UUID#.json | v2ray run </p></div>
+    <div>若需连接到ssh后台，可以先使用"VPS出口"进行连接，然后访问22，2222，2223这些接口</div>
+    <div>Linux下连接ssh后台示例: <p style="background-color: lightgray"> proxychains ssh root@127.0.0.1 -p2223 -v -o StrictHostKeyChecking=no </p></div>
+    <br />
     <div><font color="#009900"><b>VMESS协议链接(VPS出口)：</b></font></div>
     <div>#vmlink#</div>
     <div><img src="/M#UUID#.png"></div>

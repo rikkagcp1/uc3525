@@ -1,7 +1,5 @@
 {
-  "log": {
-    "loglevel": "debug"
-  },
+  "log": { "loglevel": "debug" },
   "inbounds": [
     {
       "port": 1080,
@@ -37,6 +35,9 @@
         "network": "ws",
         "security": "tls",
         "wsSettings": {
+          "headers": {
+            "Host": "#ARGO_URL#"
+          },
           "path": "#VMESS_WSPATH#"
         }
       }
