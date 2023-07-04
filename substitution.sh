@@ -16,6 +16,7 @@ perform_variable_substitution() {
         # Get the value of the variable
         local var_value="${!var_name}"
         local escaped_value="${var_value//\//\\/}"  # Escape forward slashes
+        escaped_value="${escaped_value//&/\\&}"  # Escape &
 
         # Replace the placeholder with the variable value in the text file
         sed -i "s/#${var_name}#/${escaped_value}/g" "$text_file"

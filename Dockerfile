@@ -20,7 +20,7 @@ COPY cfd_refresh.sh ./
 COPY monitor.sh ./
 
 RUN apt-get update && apt-get --no-install-recommends install -y \
-        wget unzip qrencode iproute2 && \
+        wget unzip iproute2 && \
     wget -O cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \
     dpkg -i cloudflared.deb && \
     rm -f cloudflared.deb && \

@@ -27,13 +27,6 @@ trlink_warp=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$ARGO_URL":443?sec
 # 产生订阅
 echo -e "$vmlink\n$vmlink_warp\n$vllink\n$vllink_warp\n$trlink\n$trlink_warp" | base64 -w 0 > /usr/share/nginx/html/$UUID.txt
 
-qrencode -o /usr/share/nginx/html/M$UUID.png $vmlink
-qrencode -o /usr/share/nginx/html/MW$UUID.png $vmlink_warp
-qrencode -o /usr/share/nginx/html/L$UUID.png $vllink
-qrencode -o /usr/share/nginx/html/LW$UUID.png $vllink_warp
-qrencode -o /usr/share/nginx/html/T$UUID.png $trlink
-qrencode -o /usr/share/nginx/html/TW$UUID.png $trlink_warp
-
 HTML_PATH="/usr/share/nginx/html/$UUID.html"
 [ -f "$HTML_PATH" ] && rm "$HTML_PATH"
 cp template_webpage.html "$HTML_PATH"

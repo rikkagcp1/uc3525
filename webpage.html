@@ -17,6 +17,7 @@
             margin-bottom: 10px;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.js"></script>
 </head>
 <body bgcolor="#FFFFFF" text="#000000">
     <div><b>由于平台分配的域名大概率不支持代理直连（不支持Websocket），再加上Cloudflare Quick Tunnel可能随时失效，因此推荐使用订阅。</b></div>
@@ -28,24 +29,24 @@
     <br />
     <div><font color="#009900"><b>VMESS协议链接(VPS出口)：</b></font></div>
     <div>#vmlink#</div>
-    <div><img src="/M#UUID#.png"></div>
+    <div id="vmess_qr"></div>
     <div><font color="#009900"><b>VMESS协议链接(Warp出口)：</b></font></div>
     <div>#vmlink_warp#</div>
-    <div><img src="/MW#UUID#.png"></div>
+    <div id="vmess_warp_qr"></div>
 
     <div><font color="#009900"><b>VLESS协议链接(VPS出口)：</b></font></div>
     <div>#vllink#</div>
-    <div><img src="/L#UUID#.png"></div>
+    <div id="vless_qr"></div>
     <div><font color="#009900"><b>VLESS协议链接(Warp出口)：</b></font></div>
     <div>#vllink_warp#</div>
-    <div><img src="/LW#UUID#.png"></div>
+    <div id="vless_warp_qr"></div>
 
     <div><font color="#009900"><b>TROJAN协议链接(VPS出口)：</b></font></div>
     <div>#trlink#</div>
-    <div><img src="/T#UUID#.png"></div>
+    <div id="tr_qr"></div>
     <div><font color="#009900"><b>TROJAN协议链接(Warp出口)：</b></font></div>
     <div>#trlink_warp#</div>
-    <div><img src="/TW#UUID#.png"></div>
+    <div id="tr_warp_qr"></div>
 
     <div><font color="#009900"><b>SS协议明文：</b></font></div>
     <div>服务器地址：#ARGO_URL#</div>
@@ -57,5 +58,21 @@
     <div>path路径(VPS出口)：#SS_WSPATH#?ed=2048</div>
     <div>path路径(Warp出口)：#SS_WARP_WSPATH#?ed=2048</div>
     <div>TLS：开启</div>
+
+    <script type="text/javascript">
+        function createQRCode(elementId, qrText) {
+            new QRCode(document.getElementById(elementId), {
+                text: qrText,
+                correctLevel: QRCode.CorrectLevel.M,
+            });
+        }
+
+        createQRCode("vmess_qr", "#vmlink#");
+        createQRCode("vmess_warp_qr", "#vmlink_warp#");
+        createQRCode("vless_qr", "#vllink#");
+        createQRCode("vless_warp_qr", "#vllink_warp#");
+        createQRCode("tr_qr", "#trlink#");
+        createQRCode("tr_warp_qr", "#trlink_warp#");
+    </script>
 </body>
 </html>
