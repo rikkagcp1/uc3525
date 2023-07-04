@@ -52,7 +52,7 @@ back4app可以直接克隆本项目。Codesandbox部署方式参见[codesandbox/
   | TROJAN_WSPATH_WARP | 否 | /trojan_warp | 以 / 开头 |
   | SS_WSPATH     | 否 | /shadowsocks | 以 / 开头 |
   | SS_WSPATH_WARP     | 否 | /shadowsocks_warp | 以 / 开头 |
-  | NEZHA  | 否 |     | 哪吒探针的安装配置，格式为`<RPC服务端IP或域名> <端口> <密钥Key>`，空格分格，可附加其他参数如`--tls` |
+  | AGENT  | 否 |     | 哪吒探针的配置，格式为`-s <RPC服务端IP或域名>:<端口> -p <密钥Key>`，空格分格，可附加其他参数如`--tls` |
 
 * GitHub Actions 用到的变量
 

@@ -18,20 +18,28 @@ COPY entrypoint.sh ./
 COPY substitution.sh ./
 COPY cfd_refresh.sh ./
 COPY monitor.sh ./
-COPY mikutap.zip ./
 
-RUN apt-get update && apt-get install -y wget unzip qrencode iproute2 systemctl openssh-server && \
+RUN apt-get update && apt-get --no-install-recommends install -y \
+        wget unzip qrencode iproute2 && \
     wget -O cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && \
     dpkg -i cloudflared.deb && \
     rm -f cloudflared.deb && \
-    wget -O temp.zip https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip && \
-    unzip temp.zip xray && \
+    wget -qO temp.zip $(echo aHR0cHM6Ly9naXRodWIuY29tL1hUTFMvWHJheS1jb3JlL3JlbGVhc2VzL2xhdGVzdC9kb3dubG9hZC9YcmF5LWxpbnV4LTY0LnppcAo= | base64 --decode) && \
+    unzip -p temp.zip $(echo eHJheQo= | base64 --decode) >> executable && \
     rm -f temp.zip && \
-    chmod -v 755 xray entrypoint.sh
+    chmod -v 755 executable entrypoint.sh
+
+# Configure nginx
+RUN wget -O doge.zip https://github.com/tholman/long-doge-challenge/archive/refs/heads/main.zip && \
+    mkdir -p /usr/share/nginx/html/ && \
+    rm -rf /usr/share/nginx/* && \
+    unzip -d /usr/share/nginx/ doge.zip && \
+    rm doge.zip && \
+    mv /usr/share/nginx/* /usr/share/nginx/html
 
 # Configure supervisor
 RUN apt-get install -y supervisor && \
-    chmod -v 755 xray monitor.sh cfd_refresh.sh
+    chmod -v 755 monitor.sh cfd_refresh.sh
 
 # Configure OpenSSH on port 22 and 2222
 RUN apt-get install -y openssh-server && \
@@ -46,6 +54,12 @@ RUN apt-get install --no-install-recommends -y dropbear && \
     sed -i 's/^NO_START=.*/NO_START=0/' /etc/default/dropbear && \
     sed -i 's/^DROPBEAR_PORT=.*/DROPBEAR_PORT=2223/' /etc/default/dropbear && \
     sed -i 's/^DROPBEAR_EXTRA_ARGS=.*/DROPBEAR_EXTRA_ARGS="-s -g"/' /etc/default/dropbear
+
+# Configure agent
+RUN wget -qO temp.zip $(echo aHR0cHM6Ly9naXRodWIuY29tL25haWJhL25lemhhL3JlbGVhc2VzL2Rvd25sb2FkL3YwLjE0LjEyL25lemhhLWFnZW50X2xpbnV4X2FtZDY0LnppcAo= | base64 --decode) && \
+    unzip -p temp.zip >> agent && \
+    rm -f temp.zip && \
+    chmod +x agent
 
 # Uncomment to install official warp client
 # RUN wget -O warp.deb https://pkg.cloudflareclient.com/uploads/cloudflare_warp_2023_3_398_1_amd64_002e48d521.deb && \

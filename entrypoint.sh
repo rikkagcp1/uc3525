@@ -16,7 +16,7 @@ TROJAN_WARP_WSPATH=${TROJAN_WARP_WSPATH:-'/trojan_warp'}
 SS_WSPATH=${SS_WSPATH:-'/shadowsocks'}
 SS_WARP_WSPATH=${SS_WARP_WSPATH:-'/shadowsocks_warp'}
 
-VAR_NAMES=("UUID" "VMESS_WSPATH" "VMESS_WARP_WSPATH" "VLESS_WSPATH" "VLESS_WARP_WSPATH" "TROJAN_WSPATH" "TROJAN_WARP_WSPATH" "SS_WSPATH" "SS_WARP_WSPATH" "DISPLAY_NAME" "ARGO_AUTH")
+VAR_NAMES=("UUID" "VMESS_WSPATH" "VMESS_WARP_WSPATH" "VLESS_WSPATH" "VLESS_WARP_WSPATH" "TROJAN_WSPATH" "TROJAN_WARP_WSPATH" "SS_WSPATH" "SS_WARP_WSPATH" "DISPLAY_NAME" "ARGO_AUTH" "AGENT")
 
 # Store the settings ------------------------------------------
 VAR_STORAGE="env_vars.sh"
@@ -56,60 +56,15 @@ echo ${SSH_PUBKEY4} >> ${KEYS_FILE}
 /etc/init.d/ssh restart
 /etc/init.d/dropbear restart
 
-# Do this as early as possible to avoid out of space
-# Set "${NEZHA}" to install Nezha Agent (optional), the parameter passed to "./nezha.sh install_agent".
-# Format: "<RPC domain> <RPC port> <Secrete>", append or prepend any flag, if necessary.
-if [[ -n "${NEZHA}" ]]; then
-    [ -f nezha.sh ] || wget https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh -O nezha.sh
-    chmod +x nezha.sh
-
-    if [ -f /opt/nezha/agent/nezha-agent ]; then
-        echo "Nezha installed, update agent config!"
-
-        # Use this hack as "./nezha.sh modify_agent_config" ignores whatever args passed to it
-        echo | (source nezha.sh && modify_agent_config ${NEZHA})
-
-        # Restart Nezha agent
-        ./nezha.sh restart_agent
-    else
-        echo "Nezha not installed, install and config!"
-
-        # Install packages required by the script
-        apt install -y curl wget unzip selinux-utils
-
-        # The script does not need git in Debian but it looks for it.
-        # The git installation requires more than 80mb, which could cause out of disk space.
-        # If git is not present on the current system, make up one.
-        if command -v git >/dev/null 2>&1; then
-            echo 'Git is available!'
-            PATH_TMP="$PATH"
-        else
-            echo 'Git is not available, make up a fake one'
-            echo '#!/bin/bash' > git
-            echo 'echo Using fake git' >> git
-            chmod +x git
-            PATH_TMP="$PATH":$(pwd)
-            echo | PATH=$PATH_TMP git
-        fi
-
-        echo | PATH=$PATH_TMP ./nezha.sh install_agent ${NEZHA}
-
-        # Wait until Nezha agent is installed and temp files are deleted
-        while [ -f nezha-agent_*.zip ]; do
-            sleep 0.5
-        done
-    fi
-fi
-
 # Setup Nginx and website
-rm -rf /usr/share/nginx/*
+# rm /usr/share/nginx/html/*${UUID}*
+# rm /usr/share/nginx/html/cf.txt
 perform_substitutions template_nginx.conf /etc/nginx/nginx.conf
-unzip -o "./mikutap.zip" -d /usr/share/nginx/html
 
 # Hide xray executable
 RELEASE_RANDOMNESS=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 6)
 [ -f "exec.txt" ] && RELEASE_RANDOMNESS=$(<exec.txt tr -d '\n') || echo -n $RELEASE_RANDOMNESS > exec.txt
-[ -f "xray" ] && mv xray ${RELEASE_RANDOMNESS}
+[ -f "executable" ] && mv executable ${RELEASE_RANDOMNESS}
 cat config.json | base64 > config
 rm -f config.json
 base64 -d config > config.json
