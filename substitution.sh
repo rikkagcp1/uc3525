@@ -1,15 +1,17 @@
 #!/bin/bash
 
-# Function to perform variable substitution in a text file.
+# Function to perform variable substitution.
 # E.g.: #VARIABLE_NAME# will be replaced with the value of
 #       environmental variable $VARIABLE_NAME. # pairs will be
 #       removed after the substitution.
-# The first argument is the path to the file.
-# The rest arguments are the variable names.
+# The arguments are the variable names.
+# The input and output are pipes
 perform_variable_substitution() {
-    local text_file="$1"  # Text file to be processed
-    shift  # Shift the arguments to remove the text_file argument
     local var_names=("$@")  # Array of variable names
+
+    # Read the input text from stdin
+    local text
+    read -r -d '' text
 
     # Iterate over each variable name in the array
     for var_name in "${var_names[@]}"; do
@@ -19,6 +21,9 @@ perform_variable_substitution() {
         escaped_value="${escaped_value//&/\\&}"  # Escape &
 
         # Replace the placeholder with the variable value in the text file
-        sed -i "s/#${var_name}#/${escaped_value}/g" "$text_file"
+        text=$(echo "$text" | sed "s/#${var_name}#/${escaped_value}/g")
     done
+
+    # Output the processed text
+    echo "$text"
 }

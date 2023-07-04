@@ -41,8 +41,7 @@ source substitution.sh
 # Make replace $2 with $1, and perform substitution on the new $2.
 perform_substitutions() {
     [ -f "$2" ] && rm "$2"
-    cp "$1" "$2"
-    perform_variable_substitution "$2" "${VAR_NAMES[@]}"
+    perform_variable_substitution "${VAR_NAMES[@]}" < "$1" > "$2"
 }
 
 perform_substitutions template_config.json config.json

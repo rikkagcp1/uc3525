@@ -11,10 +11,7 @@ echo $ARGO_URL > '/usr/share/nginx/html/cf.txt'
 echo "!!! URL is: $ARGO_URL !!!" 1>&2
 
 # 输出vmess客户端配置文件到$UUID.json
-CLIENT_JSON_PATH="/usr/share/nginx/html/$UUID.json"
-[ -f "$CLIENT_JSON_PATH" ] && rm "$CLIENT_JSON_PATH"
-cp template_client_config.json "$CLIENT_JSON_PATH"
-perform_variable_substitution "$CLIENT_JSON_PATH" ${VAR_NAMES[@]} 'ARGO_URL'
+perform_variable_substitution ${VAR_NAMES[@]} 'ARGO_URL' < template_client_config.json > "/usr/share/nginx/html/$UUID.json"
 
 # 生成qr码以及网页
 vmlink=$(echo -e '\x76\x6d\x65\x73\x73')://$(echo -n "{\"v\":\"2\",\"ps\":\"${DISPLAY_NAME}vmess\",\"add\":\"$ARGO_URL\",\"port\":\"443\",\"id\":\"$UUID\",\"aid\":\"0\",\"net\":\"ws\",\"type\":\"none\",\"host\":\"$ARGO_URL\",\"path\":\"$VMESS_WSPATH?ed=2048\",\"tls\":\"tls\"}" | base64 -w 0)
@@ -27,7 +24,4 @@ trlink_warp=$(echo -e '\x74\x72\x6f\x6a\x61\x6e')"://"$UUID"@"$ARGO_URL":443?sec
 # 产生订阅
 echo -e "$vmlink\n$vmlink_warp\n$vllink\n$vllink_warp\n$trlink\n$trlink_warp" | base64 -w 0 > /usr/share/nginx/html/$UUID.txt
 
-HTML_PATH="/usr/share/nginx/html/$UUID.html"
-[ -f "$HTML_PATH" ] && rm "$HTML_PATH"
-cp template_webpage.html "$HTML_PATH"
-perform_variable_substitution "$HTML_PATH" ${VAR_NAMES[@]} 'ARGO_URL' 'vmlink' 'vmlink_warp' 'vllink' 'vllink_warp' 'trlink' 'trlink_warp'
+perform_variable_substitution ${VAR_NAMES[@]} 'ARGO_URL' 'vmlink' 'vmlink_warp' 'vllink' 'vllink_warp' 'trlink' 'trlink_warp' < template_webpage.html > "/usr/share/nginx/html/$UUID.html"
