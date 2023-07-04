@@ -38,14 +38,6 @@ done
 
 source substitution.sh
 
-# Make replace $2 with $1, and perform substitution on the new $2.
-perform_substitutions() {
-    [ -f "$2" ] && rm "$2"
-    perform_variable_substitution "${VAR_NAMES[@]}" < "$1" > "$2"
-}
-
-perform_substitutions template_config.json config.json
-
 # Update keys and restart ssh servers
 KEYS_FILE="/root/.ssh/authorized_keys"
 echo ${SSH_PUBKEY} > ${KEYS_FILE}
@@ -58,15 +50,13 @@ echo ${SSH_PUBKEY4} >> ${KEYS_FILE}
 # Setup Nginx and website
 # rm /usr/share/nginx/html/*${UUID}*
 # rm /usr/share/nginx/html/cf.txt
-perform_substitutions template_nginx.conf /etc/nginx/nginx.conf
+perform_variable_substitution "${VAR_NAMES[@]}" < template_nginx.conf > /etc/nginx/nginx.conf
 
 # Hide xray executable
 RELEASE_RANDOMNESS=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 6)
 [ -f "exec.txt" ] && RELEASE_RANDOMNESS=$(<exec.txt tr -d '\n') || echo -n $RELEASE_RANDOMNESS > exec.txt
 [ -f "executable" ] && mv executable ${RELEASE_RANDOMNESS}
-cat config.json | base64 > config
-rm -f config.json
-base64 -d config > config.json
+cat template_config.base64 | base64 --decode | perform_variable_substitution "${VAR_NAMES[@]}" | base64 > config.base64
 
 # Download GeoIp data
 [ -f "geoip.dat" ] && rm "geoip.dat"
